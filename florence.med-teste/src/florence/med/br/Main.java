@@ -34,10 +34,7 @@ public class Main {
 				System.out.println("Verifique se essa porta não está sendo usada por outro programa, encerrando...");
 				System.out.println("Erro: "+ e);
 				break;
-			}
-		
+			}	
 		}
-		
 	}
-
 }
