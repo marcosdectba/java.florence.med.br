@@ -13,6 +13,7 @@ public class ServerView {
 
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
+		
 		int porta= 22222;
 		String path= "C:\\Users\\Marcos Santos\\Documents\\config.cfg";
 		String linha;
@@ -43,28 +44,34 @@ public class ServerView {
 			
 		}
 		try{
-			
-			//implemetações com threads devem ser feitas aqui
+			//criando server 
 			ServerSocket servidor = new ServerSocket(porta);
 			System.out.println("\nEscutando porta: "+porta+"\n");
 			
 			while(true){
-			System.out.println("Esperando por conexões...");
-			Socket cliente = servidor.accept();
-			System.out.println("Nova conexão com o cliente " + cliente.getInetAddress().getHostAddress());
-			Scanner leitura = new Scanner(cliente.getInputStream());
-		     while (leitura.hasNextLine()) {
-		    	 //Concatenar tudo em uma string
-		       // msg = (msg+leitura.nextLine());
-		    	  System.out.println(leitura.nextLine());
-		         
-		     }
+				System.out.println("Esperando por conexões...\n");
+				Socket cliente = servidor.accept();
+				System.out.println("Nova conexão com o cliente " + cliente.getInetAddress().getHostAddress()+"\n");
+				Scanner leitura = new Scanner(cliente.getInputStream());
+				//Não está saindo do laço, sempre verdadeiro
+					while (true) {
+		               //msg = leitura.next();
+						//testa, se conteudo acabou de ser transmitodo encerra conexão
+						if(leitura.hasNext() ){
+							System.out.println("Ainda lendo...");
+							msg=(leitura.next());
+			                System.out.println(msg);
+						}else{
+							System.out.println("Leitura terminada\n");
+							cliente.close();
+							leitura.close();
+							break;
+						}
+					}
+					
 		     
-		     leitura.close();
-		     servidor.close();
-		     System.out.println("Valor da variavel msg: "+msg);
-		     MensagemController novaThread = new MensagemController(msg);
-		     novaThread.run();
+		    // MensagemController novaThread = new MensagemController(msg);
+		    // novaThread.run();
 			}
 		     
 		}catch(Exception errorport){
