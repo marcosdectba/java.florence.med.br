@@ -3,9 +3,14 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.Scanner;
+
+import javax.swing.plaf.synth.SynthSeparatorUI;
 
 import controller.florence.med.br.MensagemController;
 
@@ -45,35 +50,35 @@ public class ServerView {
 		}
 		try{
 			//criando server 
-			ServerSocket servidor = new ServerSocket(porta);
+			ServerSocket server = new ServerSocket(porta);
 			System.out.println("\nEscutando porta: "+porta+"\n");
 			
-			while(true){
+			while(true){	
 				System.out.println("Esperando por conexões...\n");
-				Socket cliente = servidor.accept();
-				System.out.println("Nova conexão com o cliente " + cliente.getInetAddress().getHostAddress()+"\n");
-				Scanner leitura = new Scanner(cliente.getInputStream());
-				//Não está saindo do laço, sempre verdadeiro
-					while (true) {
-		               //msg = leitura.next();
-						//testa, se conteudo acabou de ser transmitodo encerra conexão
-						if(leitura.hasNext() ){
-							System.out.println("Ainda lendo...");
-							msg=(leitura.next());
-			                System.out.println(msg);
-						}else{
-							System.out.println("Leitura terminada\n");
-							cliente.close();
-							leitura.close();
-							break;
-						}
-					}
-					
-		     
+				Socket sockt = server.accept();
+				System.out.println("Nova conexão com o cliente " + sockt.getInetAddress().getHostAddress()+"\n");
+				
+				
+				InputStream input = sockt.getInputStream();
+				int tam = input.available();
+				//input.read();
+				System.out.println("Qta de bytes a ler: "+tam);
+				
+				BufferedReader in = new BufferedReader(new InputStreamReader(input));
+		 
+			    byte[] arg0 = new byte[tam];
+				//System.out.println(aux);
+			    input.read(arg0);
+			    //System.out.println(Arrays.toString(arg0));
+			    String teste = new String(arg0);
+			    System.out.println(teste);
+			    //s = input.read();
+			    in.close(); 
+				System.out.println("Dados recebdos, fim da leitura");
 		    // MensagemController novaThread = new MensagemController(msg);
 		    // novaThread.run();
+			
 			}
-		     
 		}catch(Exception errorport){
 			
 			System.out.println("Erro ao abrir porta, verifique se a porta "+porta+" não está em uso por outro programa! Aplicação sendo encerrada!");
