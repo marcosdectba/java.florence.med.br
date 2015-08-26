@@ -7,23 +7,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
-import java.util.Scanner;
-
-import javax.swing.plaf.synth.SynthSeparatorUI;
-
 import controller.florence.med.br.MensagemController;
 
 public class ServerView {
 
-	public static void main(String[] args) throws IOException {
-		// TODO Auto-generated method stub
-		
+	public static void main(String[] args) throws FileNotFoundException {
+
 		int porta= 22222;
 		String path= "C:\\Users\\Marcos Santos\\Documents\\config.cfg";
 		String linha;
-		String msg = "";
-		System.out.println("\nIniciando...\n");
+		
+		System.out.println("Iniciando...\n");
 		
 		try {
 			
@@ -31,27 +25,37 @@ public class ServerView {
 			BufferedReader lerArq = new BufferedReader(arq); 
 			
 			linha = lerArq.readLine();
-			try{
-				//Futuras implementacoes de carregamento de parametros devem ser implementadas aqui
-				porta = Integer.parseInt(linha); 
+			String parametros[] = linha.split("="); 
+			if(parametros[0].equals("porta")){
 				
-			}catch(Exception eio){
-				
-				System.out.println("Arquivo de configuração invalido, utilizando valores padrões.");
-				
+				try{
+					
+					porta = Integer.parseInt(parametros[1]); 
+					
+				}catch(Exception exception){
+					
+					System.out.println("Arquivo de configuração invalido, use portas entre 1025 e 65535. Utilizando valores padrões.\n");
+					
+				}
+			}else{
+				System.out.println("Parametros invalidos, use: porta=[1025-65535]\n");
 			}
 			
+			//fechando arquivo e buffer de leitura
 			lerArq.close();
+			arq.close();
 			
-		}catch (FileNotFoundException e) {
+		}catch (IOException e) {
 			
-			System.out.println("Não foi possivel ler o arquivo de configuração, usando os valores padrões.");
+			System.out.println("Não foi possivel ler o arquivo de configuração, usando os valores padrões.\n");
 			
 		}
+		
 		try{
 			//criando server 
+			@SuppressWarnings("resource")
 			ServerSocket server = new ServerSocket(porta);
-			System.out.println("\nEscutando porta: "+porta+"\n");
+			System.out.println("Escutando porta: "+porta+"\n");
 			
 			while(true){	
 				System.out.println("Esperando por conexões...\n");
@@ -60,28 +64,24 @@ public class ServerView {
 				
 				
 				InputStream input = sockt.getInputStream();
+				//variavel tam mostra o tamanho do buffer a ser lido, depois e criado um array de bytes que e convertido em string
 				int tam = input.available();
-				//input.read();
-				System.out.println("Qta de bytes a ler: "+tam);
-				
 				BufferedReader in = new BufferedReader(new InputStreamReader(input));
-		 
-			    byte[] arg0 = new byte[tam];
-				//System.out.println(aux);
-			    input.read(arg0);
-			    //System.out.println(Arrays.toString(arg0));
-			    String teste = new String(arg0);
-			    System.out.println(teste);
-			    //s = input.read();
+			    byte[] dados = new byte[tam];
+			    input.read(dados);
+			    String inputClient = new String(dados);
+			    System.out.println(inputClient);
 			    in.close(); 
-				System.out.println("Dados recebdos, fim da leitura");
-		    // MensagemController novaThread = new MensagemController(msg);
-		    // novaThread.run();
+				System.out.println("Dados recebidos, fim da leitura");
+			//implementacao de  threads	
+		     MensagemController novaThread = new MensagemController(inputClient);
+		     Thread mensagemControllerThread = new Thread(novaThread);
+		     mensagemControllerThread.start();
 			
 			}
 		}catch(Exception errorport){
 			
-			System.out.println("Erro ao abrir porta, verifique se a porta "+porta+" não está em uso por outro programa! Aplicação sendo encerrada!");
+			System.out.println("Erro ao abrir porta, verifique se a porta "+porta+" não está em uso por outro programa. Aplicação sendo encerrada.");
 			
 		}
 	}
