@@ -16,6 +16,7 @@ public class ServerView {
 		int porta= 22222;
 		String path= "C:\\Users\\Marcos Santos\\Documents\\config.cfg";
 		String linha;
+		String ipClient;
 		
 		System.out.println("Iniciando...\n");
 		
@@ -58,23 +59,23 @@ public class ServerView {
 			System.out.println("Escutando porta: "+porta+"\n");
 			
 			while(true){	
+				
 				System.out.println("Esperando por conexões...\n");
 				Socket sockt = server.accept();
-				System.out.println("Nova conexão com o cliente " + sockt.getInetAddress().getHostAddress()+"\n");
-				
-				
-				InputStream input = sockt.getInputStream();
+				ipClient = sockt.getInetAddress().getHostAddress();
+				System.out.println("Nova conexão com: "+ ipClient);
+				//Lendo dados enviados pelo client
 				//variavel tam mostra o tamanho do buffer a ser lido, depois e criado um array de bytes que e convertido em string
+				InputStream input = sockt.getInputStream();
 				int tam = input.available();
 				BufferedReader in = new BufferedReader(new InputStreamReader(input));
 			    byte[] dados = new byte[tam];
 			    input.read(dados);
-			    String inputClient = new String(dados);
-			    System.out.println(inputClient);
+			    String msgClient = new String(dados);
 			    in.close(); 
 				System.out.println("Dados recebidos, fim da leitura");
 			//implementacao de  threads	
-		     MensagemController novaThread = new MensagemController(inputClient);
+		     MensagemController novaThread = new MensagemController(msgClient, ipClient);
 		     Thread mensagemControllerThread = new Thread(novaThread);
 		     mensagemControllerThread.start();
 			
